@@ -1,0 +1,94 @@
+.main_content{
+	margin-top: 50px;
+}
+
+.nav_side h3{
+	padding-bottom: 7px;
+}
+
+.nav_side ul li{
+	padding-top: 15px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #eaeaea;
+}
+
+.nav_side ul li a{
+	color: #333;
+}
+
+.container .row .inner{
+	padding: 15px;
+	background-color: #fff;
+}
+
+.container .row .inner .mask{
+	width: 100%;
+	height: 250px;
+	overflow: hidden;
+}
+
+.container .row .inner .mask img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.container .row .inner > a:first-of-type{
+	color: #c1272d;
+}
+
+.container .row .inner h3{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	line-height: 1.25em;
+	max-height: 4.5em;
+	-webkit-line-clamp:3;
+	-webkit-box-orient: vertical;
+}
+
+.container .row .inner p{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	line-height: 1.25em;
+	max-height: 5em;
+	-webkit-line-clamp:4;
+	-webkit-box-orient: vertical;
+}
+
+.container > .row > .content{
+	padding: 15px;
+	background-color: #fff;
+}
+
+article > p{
+	padding-left:30px;
+	padding-right:30px;
+}
+
+article > img{
+	width: 100%;
+	margin: 15px 0;
+}
+
+article > iframe{
+	width: 100%;
+	min-height: 500px;
+	margin: 15px 0;
+}
+
+.comments_post{
+	margin-bottom: 50px;
+}
+
+.comments_post h3{
+	width: 100%;
+	padding-top: 30px;
+	padding-bottom: 15px;
+	border-top: 2px solid #333;
+}
+
+.comments_posts_list .media .media-left > img{
+	width: 64px;
+}

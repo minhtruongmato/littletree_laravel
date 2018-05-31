@@ -1,0 +1,104 @@
+@font-face{
+	font-family: 'webFont_n';
+	src: url(../fonts/Alegreya-Regular.ttf);
+}
+
+@font-face{
+	font-family: 'webFont_b';
+	src: url(../fonts/Alegreya-Bold.ttf);
+}
+
+body{
+	font-family: 'webFont_n';
+}
+
+h1{font-size:2.25em;}
+h2{font-size:1.875em;}
+h3{font-size:1.5em;}
+h4{font-size:1.125em;}
+p{font-size:1em;}
+
+.nav_list{
+	font-family: 'webFont_b';
+	text-transform: uppercase;
+	font-size: 1.2em;
+}
+
+.fix_header .nav_list{
+	font-size: 1em;
+}
+
+ul.list-group{
+	font-family: 'webFont_b';
+}
+
+.panel-default > .panel-heading,
+.nav_product .panel-heading{
+	font-family: 'webFont_b';
+	font-size: 1.5em;
+}
+
+.nav_product > ul > li a{
+	font-size: 1.125em;
+}
+
+span.productName{
+	font-family: 'webFont_b';
+	font-size: 1.25em;
+}
+
+#about .right div[class*="col-"] h4{
+	font-family: 'webFont_b';
+}
+
+h2.productName{
+	font-family: 'webFont_b';
+}
+
+ul.nav-tabs li a{
+	font-family: 'webFont_b';
+}
+
+.comments_posts_list .media .media-body .media-heading{
+	font-family: 'webFont_b';
+}
+
+.price{
+	font-family: 'webFont_b';
+	font-size: 1.25em;
+}
+
+.price_old{
+	color: #95989a;
+	text-decoration:line-through;
+	font-size: 1em;
+	padding-left: 5px;
+}
+
+.title_big{
+	font-family: 'webFont_b';
+	font-size: 1.5em;
+	text-transform: uppercase;
+}
+
+.title_mid{
+	font-family: 'webFont_b';
+	font-size: 1em;
+	text-transform: uppercase;
+}
+
+.footer h3{
+	font-family: 'webFont_b';
+}
+
+p{
+	text-align: justify;
+}
+
+@media (max-width: 970px){
+	.nav_list ul.nav >li >ul>li{
+		font-size: 1em;
+		font-family: webFont_n;
+	}
+}
+

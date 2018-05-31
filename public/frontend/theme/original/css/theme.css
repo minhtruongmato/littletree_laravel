@@ -1,0 +1,208 @@
+/*
+CSS for theme original
+ */
+
+/*
+---------- HEADER ----------
+*/
+
+.top_header{
+    background: #c1272d;
+}
+
+.header .logo{
+    background-image: url(../img/logo.png);
+}
+
+.header .nav_list a:hover{
+    background-color: transparent;
+}
+
+.fix_header .logo{
+    background-image: url(../img/logo_resize.png);
+}
+
+.fix_header{
+    background: #c1272d;
+}
+
+.fix_header .nav_list a, .fix_header .nav_list a:hover{
+    color: #fff;
+}
+
+/*
+---------- BODY ----------
+*/
+
+.big_cover{
+    background-image: url(../img/big_cover.jpg);
+}
+
+.title_big{
+    color: #c1272d;
+}
+
+.badge{
+    background: #c1272d;
+}
+
+.nav_list{
+    border-top-color: #c1272d;
+}
+
+.nav_product > ul > li a{
+    color: #c1272d;
+}
+
+.nav_product ul > li.active > a,
+.nav_product ul > li.active:hover > a{
+    color: #c1272d;
+}
+
+.nav_product > ul > li.active, .nav_product > ul > li.active:hover{
+    background-color: #c1272d;
+}
+
+.nav_expand {
+    border-top:5px solid #c1272d;
+}
+
+.nav_list ul.nav >li >ul>li{
+    border-bottom: 1px solid #333;
+}
+
+.nav_list ul.nav >li >ul>li:last-of-type{
+    border-bottom: transparent;
+}
+
+.nav>li>a:focus, .nav>li>a:hover{
+    color: #fff;
+    background-color: #c1272d;
+}
+
+.nav_list li a:hover{
+    color: #c1272d;
+}
+
+.panel-default > .panel-heading {
+    color: #c1272d;
+    background-color: transparent;
+    border-color: #none;
+}
+
+ul.list-group li:hover{
+    background: #c1272d;
+}
+
+ul.list-group li:hover > a{
+    color: #fff;
+}
+
+span.productName{
+    color: #c1272d;
+}
+
+.row > .item > .inner > .hover{
+    background-color: rgba(193,39,45,.8);
+}
+
+.row > .item > .inner > .hover span.productName{
+    color: #fff;
+}
+
+.container-fluid#tasting_wine{
+    background-image: url(../img/tasting_wine.jpg);
+}
+
+#news .row .inner a{
+    color: #c1272d;
+}
+
+#news .row .inner a.btn{
+    color: #fff;
+}
+
+#about .left{
+    background-image: url(../img/big_cover.jpg);
+}
+
+#about .right{
+    background-color: #c1272d;
+}
+
+.nav_side h3{
+    color: #c1272d;
+    border-bottom: 2px solid #c1272d;
+}
+
+.nav-pills a{
+    color: #c1272d;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus{
+    background-color: #c1272d;
+}
+
+h2.productName{
+    color: #c1272d;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
+    border:1px solid #c1272d ;
+    border-bottom-color: transparent;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #c1272d;
+}
+
+.nav-tabs>li>a:hover {
+    border-color: #eee #eee #c1272d;
+}
+
+.comments_posts_list .media .media-body .media-heading{
+    color: #c1272d;
+}
+
+/*
+---------- FOOTER ----------
+*/
+
+.subscribe h3{
+    color: #c1272d;
+}
+
+.subscribe .btn-default{
+    background-color: #c1272d;
+    color: #fff;
+}
+
+.footer{
+    background-color: #fff;
+}
+
+.footer h3{
+    color: #c1272d;
+}
+
+.footer .copyright{
+    background-color: #c1272d;
+    color: #fff;
+}
+
+/*
+---------- TEMPLATE ----------
+*/
+
+.modal .modal-header{
+    background-color: #c1272d;
+    color: #fff;
+}
+
+.price{
+    color: #c1272d;
+}
+
+.color_sub_menu{
+    color: #c1272d !important;
+}

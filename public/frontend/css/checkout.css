@@ -1,0 +1,8 @@
+.panel .table tr td:nth-of-type(2){
+	text-align: right;
+}
+
+.table tbody tr{
+	border-top-color: transparent;
+	
+}

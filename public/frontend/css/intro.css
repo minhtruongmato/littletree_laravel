@@ -1,0 +1,98 @@
+.award_item{
+	text-align: center;
+}
+
+.award_item img{
+	width: 100%;
+}
+
+.image_item{
+	height: 350px;
+	padding-bottom: 30px;
+	text-align: center;
+}
+
+.image_item .inner{
+	height: 300px;
+	overflow: hidden;
+}
+
+.image_item .inner img{
+	width: 100%;
+}
+
+.nav_side ul{
+	margin-bottom: 30px;
+}
+
+.nav_side h3{
+	padding-bottom: 7px;
+}
+
+.nav-pills{
+	text-align: center;
+	text-transform: uppercase;
+}
+
+#about{
+	height: fit-content;
+}
+
+#about .left{
+	padding-left: 0;
+	padding-right: 0;
+
+	width: 100%;
+	height:100%;
+
+	position: absolute;
+	top:0;
+	left: -100%;
+
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+
+#about .right{
+	padding: 30px 70px 50px;
+	color: #fff;
+
+	position: relative;
+}
+
+#about .right div[class*="col-"]{
+	text-align: center;
+}
+
+#about .right div[class*="col-"] p{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	line-height: 1.25em;
+	max-height: 7.5em;
+	-webkit-line-clamp:6;
+	-webkit-box-orient: vertical;
+}
+
+#about .right div[class*="col-"] .fa-3x{
+	font-size: 4em;
+	padding-top: 7px;
+	padding-bottom: 15px;
+}
+
+#about .right .title_big{
+	color: #fff;
+}
+
+.mask{
+	width: 100%;
+	height: 200px;
+	overflow: hidden;
+}
+
+.mask > a > img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
