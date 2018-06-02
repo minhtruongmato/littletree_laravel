@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Banner extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'category';
+    protected $table = 'banner';
 
     /**
      * The attributes that aren't mass assignable.

@@ -102,53 +102,18 @@ Route::get('xem-gio-hang', function(){
     return view('show-cart');
 });
 
-Route::get('thu-ruou', function(){
-    return view('show-tasting');
-});
 
 
 Route::get('xac-nhan-thong-tin-ca-nhan', function(){
     return view('cart-personal-information');
 });
 
-Route::get('xac-nhan-thong-tin-thu-ruou', function(){
-    return view('tasting-personal-information');
-});
 
 Route::get('xac-nhan-don-hang', function(){
     return view('cart-confirm-order');
 });
 
-Route::get('xac-nhan-thu-ruou', function(){
-    return view('tasting-confirm-order');
-});
 
-/**
- * Frontend blog routes
- */
-Route::get('/tu-van', function () {
-    return view('list-advises');
-});
-
-Route::get('/tu-van/danh-muc/{slug}', function () {
-    return view('list-advises');
-});
-
-Route::get('/tin-tuc', function () {
-    return view('list-news');
-});
-
-Route::get('/tin-tuc/danh-muc/{slug}', function () {
-    return view('list-news');
-});
-
-Route::get('/tu-van/{target}', function () {
-    return view('detail-blog');
-});
-
-Route::get('/tin-tuc/{target}', function () {
-    return view('detail-blog');
-});
 
 /**
  * Frontend contact route
@@ -201,27 +166,6 @@ Route::prefix('admin')->group(function() {
         Route::get('introduce/aboutUs', 'IntroduceController@aboutUs');
         Route::get('introduce/{type}', 'IntroduceController@introduce');
         Route::post('introduce/saveIntroduce/{slug}', 'IntroduceController@saveIntroduce')->name('introduce.saveIntroduce');
-
-
-
-        //image library
-        Route::resource('library', 'LibraryController');
-        // Route::post('library/store', 'LibraryController@store')->name('library.store');
-        Route::post('library/update/{id}', 'LibraryController@update')->name('library.update');
-
-        // list image
-        Route::resource('image', 'ImageController');
-        Route::post('image/store/{id}', 'ImageController@store')->name('image.store');
-
-        //Type routes
-        Route::resource('type', 'TypeController');
-        Route::post('type/search', 'TypeController@search')->name('type.search');
-        Route::post('type/update/{id}', 'TypeController@update')->name('type.update');
-
-        //Kind routes
-        Route::resource('kind', 'KindController');
-        Route::post('kind/search', 'KindController@search')->name('kind.search');
-        Route::post('kind/update/{id}', 'KindController@update')->name('kind.update');
         
         // Product routes
         Route::resource('product', 'ProductController');
@@ -243,50 +187,32 @@ Route::prefix('admin')->group(function() {
         Route::get('order/rollback/{id}', 'OrderController@rollback')->name('order.rollback');
         Route::get('export-pending', 'OrderController@excelPending')->name('export.pending');
 
-        // Product Trademark routes
-        Route::resource('trademark', 'TrademarkController');
-        Route::post('trademark/search', 'TrademarkController@search')->name('trademark.search');
-        Route::post('trademark/store', 'TrademarkController@store')->name('trademark.store');
-        Route::post('trademark/update/{id}', 'TrademarkController@update')->name('trademark.update');
-        Route::get('trademark/kind/{type_id}', 'TrademarkController@selectKind');
-
-        // Product Category routes
-        Route::resource('category', 'CategoryController');
-        Route::post('category/search', 'CategoryController@search')->name('category.search');
-        Route::post('category/store', 'CategoryController@store')->name('category.store');
-        Route::post('category/update/{id}', 'CategoryController@update')->name('category.update');
-        Route::get('category/fetchByType/{type_id}', 'CategoryController@fetchByType');
-        Route::get('category/fetchByKind/{kind_id}', 'CategoryController@fetchByKind');
-        Route::get('category/fetchByTrademark/{trademark_id}', 'CategoryController@fetchByTrademark');
-
         // Blog routes
         Route::resource('blog', 'BlogController');
-        Route::get('advise', 'BlogController@advise')->name('blog.advise');
-        Route::get('news', 'BlogController@news')->name('blog.news');
         Route::post('blog/search', 'BlogController@search')->name('blog.search');
         Route::post('blog/store', 'BlogController@store')->name('blog.store');
         Route::post('blog/update/{id}', 'BlogController@update')->name('blog.update');
+
+        // Banner routes
+        Route::resource('banner', 'BannerController');
+        Route::post('banner/store', 'BannerController@store')->name('banner.store');
+
+        // About routes
+        Route::resource('about', 'AboutController');
+        Route::post('about/update/{id}', 'AboutController@update')->name('about.update');
 
         // Blog Category routes
         Route::resource('blog-category', 'BlogCategoryController');
         Route::post('blog-category/search', 'BlogCategoryController@search')->name('blog-category.search');
         Route::post('blog-category/store', 'BlogCategoryController@store')->name('blog-category.store');
+        Route::post('blog-category/update/{id}', 'BlogCategoryController@update')->name('blog-category.update');
 
-        //Tasting routes
-        Route::get('tasting/finish', 'TastingController@finish');
-        Route::get('tasting/ajax-finish/{id}', 'TastingController@ajaxFinish');
-        Route::resource('tasting', 'TastingController');
-
-        //Origin routes
-        Route::resource('origin', 'OriginController');
-        Route::post('origin/update/{id}', 'OriginController@update')->name('origin.update');
+        // Blog Category routes
+        Route::resource('product-category', 'ProductCategoryController');
+        Route::post('product-category/search', 'ProductCategoryController@search')->name('product-category.search');
+        Route::post('product-category/store', 'ProductCategoryController@store')->name('product-category.store');
+        Route::post('product-category/update/{id}', 'ProductCategoryController@update')->name('product-category.update');
         
-        //Product Comment router
-        Route::get('comment/product/{id}', 'CommentController@fetchProductComment')->name('comment.fetchProductComment');
-        Route::post('comment_product/delete/{id}/{product_id}', 'CommentController@deleteProductComment')->name('comment.deleteProductComment');
-        Route::get('comment/blog/{id}', 'CommentController@fetchBlogComment')->name('comment.fetchBlogComment');
-        Route::post('comment_blog/delete/{id}/{blog_id}', 'CommentController@deleteBlogComment')->name('comment.deleteBlogComment');
-
         //subscrie routes
         Route::resource('subscribe', 'SubscribeController');
         Route::get('subscrie/send/{email}', 'SubscribeController@sendMail')->name('subscrie.sendMail');

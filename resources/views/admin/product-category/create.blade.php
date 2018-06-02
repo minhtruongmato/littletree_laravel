@@ -1,4 +1,4 @@
-@extends('admin.blog-category.base')
+@extends('admin.product-category.base')
 
 @section('action-content')
     <div class="container">
@@ -7,7 +7,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Thêm mới danh mục sản phẩm</div>
                     <div class="panel-body">
-                        <form class="form-horizontal" role="form" method="POST" action="{{ route('blog-category.store') }}" enctype="multipart/form-data">
+                        <form class="form-horizontal" role="form" method="POST" action="{{ route('product-category.store') }}" enctype="multipart/form-data">
                             {{ csrf_field() }}
                             <div class="form-group{{ $errors->has('title') ? ' has-error' : '' }}">
                                 <label for="title" class="col-md-4 control-label">Tên danh mục</label>
@@ -39,11 +39,7 @@
                                 <label for="type" class="col-md-4 control-label">Danh mục cha</label>
                                 <div class="col-md-6 ">
                                     <select name="parent_id" class="form-control" required="">
-                                        @foreach($blog_category as $key => $values)
-                                            <option value="{{$key}}" >
-                                                {{$values}}
-                                            </option>
-                                        @endforeach
+                                        {!! $product_category !!}
                                     </select>
                                 </div>
                             </div>

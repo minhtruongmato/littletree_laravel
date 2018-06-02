@@ -8,10 +8,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use App\Product;
-use App\Trademark;
-use App\Type;
-use App\Kind;
+use App\ProductCategory;
 use Response;
+use Session;
 use File;
 use Validator;
 use Illuminate\Support\Facades\Cookie;
@@ -35,41 +34,15 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        $products = DB::table('product')->where('is_deleted', '=', 0)->orderBy('id','desc')->paginate(10);
-        $averageRating = 0;
+        $products = DB::table('product')
+            ->select('*')
+            ->where('is_deleted',0)
+            ->paginate(10);
         foreach ($products as $key => $value) {
-            // echo $value->id.'<br>';
-            $count = DB::table('product_comment')
-                ->where('product_id', $value->id)
-                ->where('is_deleted', '=', 0)   
-                ->count();
-            
-            $rating = DB::table('product_comment')
-                ->select('rating')
-                ->where('product_id', $value->id)
-                ->get();
-            $totalRating = 0;
-            foreach ($rating as $k => $val) {
-                $totalRating = $totalRating + $val->rating;
-            }
-            
-            if($count != 0){
-                $averageRating = $totalRating/$count;
-            }else{
-                $averageRating = 0;
-            }
-            $products[$key]->rating = $averageRating;
-            $products[$key]->count = $count;
+                $sub = ProductCategory::find($value->category_id);
+                $products[$key]->sub = $sub->title;
         }
-       // print_r($products);die;
-        return view('admin/product/index', [
-            'products' => $products,
-            'type_collection' => $this->fetchAllType(),
-            'kind_collection' => $this->fetchAllKind(),
-            'trademark_collection' => $this->fetchTrademark(),
-            'origin_collection' => $this->fetchAllOrigin()
-
-        ]);
+        return view('admin/product/index', ['products' => $products]);
     }
 
     /**
@@ -78,12 +51,10 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(){
-        $type = DB::table('type')->get();
-        $origin = DB::table('origin')->get();
+        $product_category_list = ProductCategory::where('is_deleted',0)->get();
+        $this->buildNewCategory($product_category_list,0,$product_category);
         return view('admin/product/create', [
-            'trademarks' => $this->fetchAllTrademark(),
-            'type' => $type,
-            'origin' => $origin
+           'product_category' => $product_category 
         ]);
     }
 
@@ -108,17 +79,15 @@ class ProductController extends Controller
         }
 
         $image_json = json_encode($fileName);
-
-        // var_dump($image_json);die;
-        $keys = ['name','type_id', 'kind_id', 'trademark_id', 'is_special', 'is_new', 'capacity', 'material', 'year', 'producer', 'volume', 'origin_id', 'price', 'selling_price', 'content', 'is_discount', 'discount_percent', 'discount_price', 'is_gift', 'gift', 'description', 'concentrations', 'quantity'];
-        // $keys = ['name'];
+        $keys = ['title','category_id' ,'price_min', 'price_mid', 'price_max', 'content', 'description'];
         $input = $this->createQueryInput($keys, $request);
         $input['image'] = $image_json;
         $input['slug'] = $uniqueSlug;
-
-        // Not implement yet
-        Product::create($input);
-
+        if(Product::create($input)){
+            Session::flash('success','Thêm mới sản phẩm thành công');
+        return redirect()->intended('admin/product');
+        }
+        Session::flash('error','Thêm mới sản phẩm thất bại');
         return redirect()->intended('admin/product');
     }
 
@@ -141,18 +110,16 @@ class ProductController extends Controller
      */
     public function edit($id){
         $product = Product::find($id);
-        $type = DB::table('type')->get();
-        $origin = DB::table('origin')->get();
         // Redirect to product list if updating product wasn't existed
         if ($product == null) {
+            Session::flash('error','Sản phẩm không tồn tại');
             return redirect()->intended('admin/product');
         }
+        $product_category_list = ProductCategory::where('is_deleted',0)->get();
+        $this->buildNewCategory($product_category_list,0,$product_category,$product['category_id']);
+        /*$product_category = $this->buildArrayForDropdown($product_category_list);*/
         return view('admin/product/edit', [
-            'product' => $product,
-            'trademarks' => $this->fetchAllTrademark(),
-            'categories' => $this->fetchCategoryByTrademark($product->trademark_id),
-            'type' => $type,
-            'origin' => $origin
+            'product' => $product,'product_category' => $product_category 
         ]);
     }
 
@@ -173,14 +140,11 @@ class ProductController extends Controller
             rename($path . '/' . $product->slug, $path . '/' . $uniqueSlug);
         }
 
-        $keys = ['name','type_id', 'kind_id', 'trademark_id', 'is_special', 'is_new', 'capacity', 'material', 'year', 'producer', 'volume', 'origin_id', 'price', 'selling_price', 'content', 'is_discount', 'discount_percent', 'discount_price', 'is_gift', 'gift', 'description', 'concentrations'];
+        $keys = ['title', 'price_min', 'price_mid', 'price_max', 'content', 'description'];
         $input = $this->createQueryInput($keys, $request);
         $input['slug'] = $uniqueSlug;
 
         $fileName = [];
-        $fileName = json_decode($product->image);
-        
-        // Upload image
         if($request->file('image')){
             foreach ($request->file('image') as $key => $file) {
                 $fileName[] = $file->hashName();
@@ -190,10 +154,12 @@ class ProductController extends Controller
             $image_json = json_encode($fileName);
             $input['image'] = $image_json;
         }
-
-        Product::where('id', $id)
-            ->update($input);
-
+        if(Product::where('id', $id)->update($input) == 1){
+            Session::flash('success','Sửa sản phẩm thành công');
+        return redirect()->intended('admin/product');
+        }
+        Session::flash('error','Sửa sản phẩm thất bại');
+        return redirect()->intended('admin/product');
         return redirect()->intended('admin/product');
     }
 
@@ -204,7 +170,12 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id){
-        Product::where('id', $id)->update(['is_deleted' => 1]);
+        $product = Product::findOrFail($id);
+        if(Product::where('id', $id)->update(['is_deleted' => 1])){
+            Session::flash('success','Xóa sản phẩm thành công');
+            return redirect()->intended('admin/product');
+        }
+        Session::flash('error','Lỗi xóa sản phẩm');
         return redirect()->intended('admin/product');
     }
 
@@ -216,42 +187,32 @@ class ProductController extends Controller
      */
     public function search(Request $request){
         $constraints = [
-            'name' => $request['name']
+            'title' => $request['title']
         ];
         $products = $this->doSearchingQuery($constraints);
-
+        foreach ($products as $key => $value) {
+                $sub = ProductCategory::find($value->category_id);
+                $products[$key]->sub = $sub->title;
+        }
         return view('admin/product/index', ['products' => $products, 'searchingVals' => $constraints]);
     }
 
     private function doSearchingQuery($constraints){
         $query = DB::table('product')
-            ->where('product.is_deleted', '=', 0)
-            ->join('type', 'type.id', '=', 'product.type_id')
-            ->join('kind', 'kind.id', '=', 'product.kind_id')
-            ->join('product_trademark', 'product_trademark.id', '=', 'product.trademark_id')
-            ->select('product.*', 'type.title as type_title', 'kind.title as kind_title', 'product_trademark.name as trademark_title');
-        $fields = array_keys($constraints);
-        $index = 0;
-        foreach ($constraints as $constraint) {
-            if ($constraint != null) {
-                $query = $query->where('product.'.$fields[$index], 'like', '%'.$constraint.'%');
-            }
-
-            $index++;
-        }
+            ->select('*')
+            ->where('is_deleted',0)
+            ->where('title', 'like', '%' . $constraints['title'] . '%');
         return $query->paginate(10);
-    }
+    }   
 
     private function validateInput($id = null, $request) {
         // echo 'required|unique:product, id, ' . $id . '|max:255';die;
         $this->validate($request, [
-            'name' => 'required|max:255',
+            'title' => 'required|max:255',
             'slug' => 'required|unique:product,slug, ' . $id . '|max:255',
-            'type_id' => 'required',
-            'price' => 'required|numeric',
-            'selling_price' => 'numeric',
-            'discount_percent' => 'numeric',
-            'discount_price' => 'numeric'
+            'price_max' => 'required|numeric',
+            'price_mid' => 'required|numeric',
+            'price_min' => 'required|numeric'
         ]);
     }
 
@@ -428,8 +389,31 @@ class ProductController extends Controller
         return response()->json(['image_json' => $image_json, 'status' => '200']); 
         
     }
-
-
+    protected function buildArrayForDropdown($data = array()){
+        $new_data = array(0 => 'Danh mục gốc');
+        foreach ($data as $key => $value) {
+            $new_data[$value['id']] = $value['title'];
+        }
+        return $new_data;
+    }
+    protected function buildNewCategory($categorie, $parent_id = 0,&$result, $parent_id_edit = "",$id_edit = "",$char=""){
+        $cate_child = array();
+        foreach ($categorie as $key => $item){
+            if ($item['parent_id'] == $parent_id){
+                $cate_child[] = $item;
+                unset($categorie[$key]);
+            }
+        }
+        if ($cate_child){
+            foreach ($cate_child as $key => $value){
+                    $select = ($value['id'] == $parent_id_edit)? 'selected' : '';
+                if($value['id'] != $id_edit){
+                    $result.='<option value="'.$value['id'].'"'.$select.'>'.$char.$value['title'].'</option>';
+                    $this->buildNewCategory($categorie, $value['id'],$result, $parent_id_edit,$id_edit, $char.'---|');
+                }
+            }
+        }
+    }
 
 
 }

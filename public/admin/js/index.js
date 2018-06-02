@@ -86,3 +86,6 @@ function to_slug(str){
     // return
     return str;
 }
+$("#notification p i").click(function(){
+    $("#notification").css("display","none");
+});

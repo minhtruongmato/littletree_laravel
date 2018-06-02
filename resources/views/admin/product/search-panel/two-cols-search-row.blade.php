@@ -7,7 +7,7 @@
       <div class="form-group">
           @php
             $stringFormat =  strtolower(str_replace(' ', '', $item));
-            $label = ($stringFormat == 'name') ? 'Tên sản phẩm' : $stringFormat;
+            $label = ($stringFormat == 'title') ? 'Tên sản phẩm' : $stringFormat;
           @endphp
           <label for="input<?=$stringFormat?>" class="col-sm-3 control-label">{{$label}}</label>
           <div class="col-sm-9">
