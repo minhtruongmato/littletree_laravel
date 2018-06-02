@@ -11,6 +11,7 @@
                 {{--<li class="active">Product Mangement</li>--}}
             </ol>
         </section>
+        <div id="notification" style="margin-bottom: 10px;">@include('errors.note')</div>
     @yield('action-content')
     <!-- /.content -->
     </div>

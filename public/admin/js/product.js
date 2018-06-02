@@ -160,7 +160,7 @@ window.onload = function(){
         var id = $(this).data('id');
         var token = $('#token').val();
         $.ajax({
-            url: url + '/hamruouthinh24/admin/product/deleteImage',
+            url: url + '/littletree_laravel/admin/product/deleteImage',
             method: 'POST',
             data: {
                 image : image, id : id, _token : token

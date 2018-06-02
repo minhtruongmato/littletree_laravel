@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Blog;
 use App\BlogCategory;
 use Response;
+use Session;
 use File;
 
 class BlogController extends Controller
@@ -29,7 +30,15 @@ class BlogController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        //
+        $blog = DB::table('blog')
+            ->select('*')
+            ->where('is_deleted',0)
+            ->paginate(10);
+        foreach ($blog as $key => $value) {
+                $sub = BlogCategory::find($value->category_id);
+                $blog[$key]->sub = $sub->title;
+        }
+        return view('admin/blog/index', ['blog' => $blog]);
     }
 
     /**
@@ -37,19 +46,6 @@ class BlogController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function advise(){
-        $advises = DB::table('blog')
-            ->select('*')
-            ->where('type', '=', 0)
-            ->where('is_deleted', '=', 0)
-            ->paginate(10);
-        $categories = $this->getCategoryByType('advise');
-        return view('admin/blog/advise', [
-            'type' => 'advise',
-            'categories' => $categories,
-            'advises' => $advises
-        ]);
-    }
 
     /**
      * Display a listing of the news.
@@ -75,12 +71,13 @@ class BlogController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(){
-        $type = Input::get('type');
-        $categories = $this->getCategoryByType($type);
+        $blog_category_list = BlogCategory::where('is_deleted',0)->get();
+        $new_blog_category = $this->buildArrayForDropdown($blog_category_list);
+        unset($new_blog_category[0]);
+        $categories = $new_blog_category;
         return view('admin/blog/create', [
-            'type' => $type,
-            'categories' => $categories
-        ]);
+                'categories' => $categories
+            ]);
     }
 
     /**
@@ -90,20 +87,22 @@ class BlogController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-        $type = Input::get('type');
+        if($request->category_id == ''){
+            Session::flash('error','Bạn phải chọn danh mục cha');
+            return redirect()->intended('admin/blog/create');
+        }
         $uniqueSlug = $this->buildUniqueSlug('blog', null, $request->slug);
-
-        // Upload image
-        $path = $request->file('image')->store(($type == 'advise') ? 'advises' : 'news');
-        $keys = ['title', 'category_id', 'description', 'content'];
+        $path = $request->file('image')->store('blog');
+        $keys = ['title', 'category_id', 'content'];
         $input = $this->createQueryInput($keys, $request);
-        $input['type'] = ($type == 'advise') ? 0 : 1;
         $input['image'] = $path;
         $input['slug'] = $uniqueSlug;
-        // Not implement yet
-        Blog::create($input);
-
-        return redirect()->intended(($type == 'advise') ? 'admin/advise' : 'admin/news');
+        if(Blog::create($input)){
+            Session::flash('success','Thêm mới bài viết thành công');
+            return redirect()->intended('admin/blog');
+        }
+        Session::flash('error','Thêm mới bài viết thất bại');
+        return redirect()->intended('admin/blog');
     }
 
     /**
@@ -125,12 +124,15 @@ class BlogController extends Controller
      */
     public function edit($id){
         $blog = Blog::find($id);
-        // Redirect to product list if updating product wasn't existed
-        if ($blog == null || count($blog) == 0) {
-            return redirect()->intended(($blog->type == 0) ? 'admin/advise' : 'admin/news');
+        if ($blog == null) {
+            Session::flash('error','Blog không tồn tại');
+            return redirect()->intended('admin/blog');
         }
+        $blog_category_list = BlogCategory::where('is_deleted',0)->get();
+        $new_blog_category = $this->buildArrayForDropdown($blog_category_list);
+        unset($new_blog_category[0]);
+        $blog->new_blog_category = $new_blog_category;
         return view('admin/blog/edit', [
-            'type' => ($blog->type == 0) ? 'advise' : 'news',
             'blog' => $blog
         ]);
     }
@@ -146,22 +148,20 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         $this->validateInput($request);
         $uniqueSlug = $this->buildUniqueSlug('blog', $request->id, $request->slug);
-
-
-        $keys = ['title', 'description', 'content'];
+        $keys = ['title', 'content'];
         $input = $this->createQueryInput($keys, $request);
         $input['slug'] = $uniqueSlug;
-
         // Upload image
         if($request->file('image')){
-            $path = $request->file('image')->store(($blog->type == 'advise') ? 'advises' : 'news');
+            $path = $request->file('image')->store('blog');
             $input['image'] = $path;
         }
-
-        Blog::where('id', $id)
-            ->update($input);
-
-        return redirect()->intended(($blog->type == 0) ? 'admin/advise' : 'admin/news');
+        if(Blog::where('id', $id)->update($input) == 1){
+            Session::flash('success','Sửa danh mục thành công');
+            return redirect()->intended('admin/blog');
+        }
+        Session::flash('error','Lỗi sửa danh mục');
+        return redirect()->intended('admin/blog');
     }
 
     /**
@@ -172,22 +172,27 @@ class BlogController extends Controller
      */
     public function destroy($id){
         $blog = Blog::findOrFail($id);
-        Blog::where('id', $id)->update(['is_deleted' => 1]);
-        return redirect()->intended(($blog->type == 0) ? 'admin/advise' : 'admin/news');
+        if(Blog::where('id', $id)->update(['is_deleted' => 1])){
+            Session::flash('success','Xóa bài viết thành công');
+            return redirect()->intended('admin/blog');
+        }
+        Session::flash('error','Lỗi xóa bài viết');
+        return redirect()->intended('admin/blog');
     }
 
     public function search(Request $request){
-        $blogs = $this->doSearchingQuery($request);
-        $key = ($request['type'] == 'advise') ? 'advises' : 'news';
-
-        return view(($request['type'] == 'advise') ? 'admin/blog/advise' : 'admin/blog/news', [
-            'type' => $request['type'],
-            $key => $blogs,
-            'searchingVals' => $request
-        ]);
+        $constraints = [
+            'title' => $request['title']
+        ];
+        $blog = $this->doSearchingQuery($constraints);
+        foreach ($blog as $key => $value) {
+            $sub = BlogCategory::find($value->category_id);
+            $blog[$key]->sub = $sub->title;
+        }
+        return view('admin/blog/index', ['blog' => $blog, 'searchingVals' => $constraints]);
     }
 
-    public function getCategoryByType($type){
+/*    public function getCategoryByType($type){
         $categories = DB::table('blog_category')
             ->select('*')
             ->where('type', '=', ($type == 'advise') ? 0 : 1)
@@ -199,17 +204,15 @@ class BlogController extends Controller
         }
 
         return $arrayCategories;
-    }
+    }*/
 
     private function doSearchingQuery($constraints){
-        $type = ($constraints['type'] == 'advise') ? 0 : 1;
         $query = DB::table('blog')
             ->select('*')
-            ->where('type', '=', $type)
+            ->where('is_deleted',0)
             ->where('title', 'like', '%' . $constraints['title'] . '%');
-
         return $query->paginate(10);
-    }
+    }  
 
     private function validateInput($request) {
         $this->validate($request, [
@@ -227,5 +230,13 @@ class BlogController extends Controller
 //            'department_id' => 'required',
 //            'division_id' => 'required'
         ]);
+    }
+
+    protected function buildArrayForDropdown($data = array()){
+        $new_data = array(0 => 'Danh mục gốc');
+        foreach ($data as $key => $value) {
+            $new_data[$value['id']] = $value['title'];
+        }
+        return $new_data;
     }
 }

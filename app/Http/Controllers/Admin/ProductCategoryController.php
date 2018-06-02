@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
-use App\BlogCategory;
-use App\Blog;
+use App\ProductCategory;
+use App\Product;
 use Response;
 use Session;
 use File;
 
-class BlogCategoryController extends Controller
+class ProductCategoryController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -30,18 +30,18 @@ class BlogCategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        $categories = DB::table('blog_category')
+        $categories = DB::table('product_category')
             ->select('*')
             ->where('is_deleted',0)
             ->paginate(10);
         foreach ($categories as $key => $value) {
             $categories[$key]->sub = 'Danh mục gốc';
             if($value->parent_id !=0){
-                $sub = BlogCategory::find($value->parent_id);
+                $sub = ProductCategory::find($value->parent_id);
                 $categories[$key]->sub = $sub->title;
             }
         }
-        return view('admin/blog-category/index', ['categories' => $categories]);
+        return view('admin/product-category/index', ['categories' => $categories]);
     }
 
     /**
@@ -50,11 +50,10 @@ class BlogCategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(){
-        $blog_category_list = BlogCategory::where('is_deleted',0)->get();
-        $new_blog_category = $this->buildArrayForDropdown($blog_category_list);
-        $blog_category = $new_blog_category;
-        return view('admin/blog-category/create', [
-                'blog_category' => $blog_category
+        $product_category_list = ProductCategory::where('is_deleted',0)->get();
+        $this->buildNewCategory($product_category_list,0,$product_category);
+        return view('admin/product-category/create', [
+                'product_category' => $product_category
             ]);
     }
 
@@ -66,30 +65,29 @@ class BlogCategoryController extends Controller
      */
     public function store(Request $request){
         $this->validateInput($request);
-        $uniqueSlug = $this->buildUniqueSlug('blog_category', null, $request->slug);
+        $uniqueSlug = $this->buildUniqueSlug('product_category', null, $request->slug);
         $keys = ['title','parent_id'];
         $input = $this->createQueryInput($keys, $request);
         $input['slug'] = $uniqueSlug;
         // Not implement yet
-        if(BlogCategory::create($input)){
-            Session::flash('success','Thêm mới danh mục blog thành công');
-            return redirect()->intended('admin/blog-category');
+        if(ProductCategory::create($input)){
+            Session::flash('success','Thêm mới danh mục thành công');
+        return redirect()->intended('admin/product-category');
         }
-        Session::flash('error','Thêm mới danh mục blog thất bại');
-        return redirect()->intended('admin/blog-category');
+        Session::flash('error','Thêm mới danh mục thất bại');
+        return redirect()->intended('admin/product-category');
     }
     public function edit($id){
-        $blog_category = BlogCategory::find($id);
-        if ($blog_category == null) {
+        $product_category = ProductCategory::find($id);
+        if ($product_category == null) {
             Session::flash('error','Danh mục không tồn tai');
-            return redirect()->intended('admin/blog-category'); 
+            return redirect()->intended('admin/product-category'); 
         }
-        $blog_category_list = BlogCategory::where('is_deleted',0)->get();
-        $new_blog_category = $this->buildArrayForDropdown($blog_category_list);
-        unset($new_blog_category[$id]);
-        $blog_category->new_blog_category = $new_blog_category;
-        return view('admin/blog-category/edit', [
-            'blog_category' => $blog_category
+
+        $product_category_list1 = ProductCategory::where('is_deleted',0)->get();
+        $this->buildNewCategory($product_category_list1,0,$product_category_list,$product_category['parent_id'],$id);
+        return view('admin/product-category/edit', [
+            'product_category' => $product_category, 'product_category_list' => $product_category_list
         ]);
     }
 
@@ -101,18 +99,22 @@ class BlogCategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id){
-        $blog_category = BlogCategory::findOrFail($id);
+        $product_category = ProductCategory::findOrFail($id);
         $this->validateInput($request);
-        $uniqueSlug = $this->buildUniqueSlug('blog_category', $request->id, $request->slug);
+        if($request->parent_id == ''){
+            Session::flash('error','Bạn phải chọn danh mục cha');
+            return redirect()->back();
+        }
+        $uniqueSlug = $this->buildUniqueSlug('product_category', $request->id, $request->slug);
         $keys = ['title','parent_id'];
         $input = $this->createQueryInput($keys, $request);
         $input['slug'] = $uniqueSlug;
-        if(BlogCategory::where('id', $id)->update($input) == 1){
+        if(ProductCategory::where('id', $id)->update($input) == 1){
             Session::flash('success','Sửa danh mục thành công');
-            return redirect()->intended('admin/blog-category');
+            return redirect()->intended('admin/product-category');
         }
         Session::flash('error','Lỗi sửa danh mục');
-        return redirect()->intended('admin/blog-category');
+        return redirect()->intended('admin/product-category');
     }
 
     /**
@@ -135,27 +137,27 @@ class BlogCategoryController extends Controller
      */
     public function destroy($id)
     { 
-        $count = BlogCategory::where('id',$id)->where('is_deleted',0)->count();
+        $count = ProductCategory::where('id',$id)->where('is_deleted',0)->count();
         if($count == 1){
-            $check_parent = BlogCategory::where('parent_id',$id)->where('is_deleted',0)->count();
+            $check_parent = ProductCategory::where('parent_id',$id)->where('is_deleted',0)->count();
             if($check_parent == 0){
-                $check_blog = Blog::where('category_id',$id)->where('is_deleted',0)->count();
-                if($check_blog == 0){
-                    if(BlogCategory::where('id', $id)->update(['is_deleted' => 1]) == 1){
+                $check_product = Product::where('category_id',$id)->where('is_deleted',0)->count();
+                if($check_product == 0){
+                    if(ProductCategory::where('id', $id)->update(['is_deleted' => 1]) == 1){
                         Session::flash('success','Xóa danh mục thành công');
-                        return redirect()->intended('admin/blog-category');
+                        return redirect()->intended('admin/product-category');
                     }
                     Session::flash('error','Lỗi không thể xóa');
-                    return redirect()->intended('admin/blog-category');
+                    return redirect()->intended('admin/product-category');
                 }
-                Session::flash('error','Danh mục blog có chứa '.$check_blog.' bài viết không thể xóa');
-                return redirect()->intended('admin/blog-category');
+                Session::flash('error','Danh mục sản phẩm có chứa '.$check_product.' sản phẩm không thể xóa');
+                return redirect()->intended('admin/product-category');
             }
-            Session::flash('error','Danh mục blog chứa '.$check_parent.' danh mục con không thể xóa');
-            return redirect()->intended('admin/blog-category');
+            Session::flash('error','Danh mục sản phẩm chứa '.$check_parent.' danh mục con không thể xóa');
+            return redirect()->intended('admin/product-category');
         }
-        Session::flash('error','Danh mục blog không tồn tại');
-        return redirect()->intended('admin/blog-category');
+        Session::flash('error','Danh mục sản phẩm không tồn tại');
+        return redirect()->intended('admin/product-category');
     }
 
     /**
@@ -172,15 +174,15 @@ class BlogCategoryController extends Controller
         foreach ($categories as $key => $value) {
             $categories[$key]->sub = 'Danh mục gốc';
             if($value->parent_id !=0){
-                $sub = BlogCategory::find($value->parent_id);
+                $sub = ProductCategory::find($value->parent_id);
                 $categories[$key]->sub = $sub->title;
             }
         }
-        return view('admin/blog-category/index', ['categories' => $categories, 'searchingVals' => $constraints]);
+        return view('admin/product-category/index', ['categories' => $categories, 'searchingVals' => $constraints]);
     }
 
     private function doSearchingQuery($constraints){
-        $query = DB::table('blog_category')
+        $query = DB::table('product_category')
             ->select('*')
             ->where('is_deleted',0)
             ->where('title', 'like', '%' . $constraints['title'] . '%');
@@ -210,5 +212,26 @@ class BlogCategoryController extends Controller
             $new_data[$value['id']] = $value['title'];
         }
         return $new_data;
+    }
+    protected function buildNewCategory($categorie, $parent_id = 0,&$result, $parent_id_edit = "",$id_edit = "",$char=""){
+        $cate_child = array();
+        foreach ($categorie as $key => $item){
+            if ($item['parent_id'] == $parent_id){
+                $cate_child[] = $item;
+                unset($categorie[$key]);
+            }
+        }
+        if ($cate_child){
+            if($parent_id == 0){
+                $result.='<option value="0" selected>Danh mục gốc</option>';
+            }
+            foreach ($cate_child as $key => $value){
+                    $select = ($value['id'] == $parent_id_edit)? 'selected' : '';
+                if($value['id'] != $id_edit){
+                    $result.='<option value="'.$value['id'].'"'.$select.'>'.$char.$value['title'].'</option>';
+                    $this->buildNewCategory($categorie, $value['id'],$result, $parent_id_edit,$id_edit, $char.'---|');
+                }
+            }
+        }
     }
 }

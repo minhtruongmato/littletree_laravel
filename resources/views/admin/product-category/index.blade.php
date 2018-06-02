@@ -1,4 +1,4 @@
-@extends('admin.blog-category.base')
+@extends('admin.product-category.base')
 @section('action-content')
     <!-- Main content -->
     <section class="content">
@@ -6,7 +6,7 @@
   <div class="box-header">
     <div class="row">
         <div class="col-sm-4">
-          <a class="btn btn-primary" href="{{ route('blog-category.create') }}">Thêm mới danh mục</a>
+          <a class="btn btn-primary" href="{{ route('product-category.create') }}">Thêm mới danh mục</a>
         </div>
     </div>
   </div>
@@ -16,10 +16,10 @@
         <div class="col-sm-6"></div>
         <div class="col-sm-6"></div>
       </div>
-      <form method="POST" action="{{ route('blog-category.search') }}">
+      <form method="POST" action="{{ route('product-category.search') }}">
          {{ csrf_field() }}
          @component('admin.layouts.search', ['title' => 'Tìm kiếm'])
-          @component('admin.blog-category.search-panel.two-cols-search-row', ['items' => ['title'],
+          @component('admin.product-category.search-panel.two-cols-search-row', ['items' => ['title'],
           'oldVals' => [isset($searchingVals) ? $searchingVals["title"] : '']])
           @endcomponent
           <br>
@@ -42,10 +42,10 @@
                   <td class="sorting_1">{{ $item->title }}</td>
                   <td class="sorting_1">{{ $item->sub }}</td>
                   <td>
-                    <form class="row" method="POST" action="{{ route('blog-category.destroy', ['id' => $item->id]) }}" onsubmit = "return confirm('Chắc chắn xoá?')">
+                    <form class="row" method="POST" action="{{ route('product-category.destroy', ['id' => $item->id]) }}" onsubmit = "return confirm('Chắc chắn xoá?')">
                         <input type="hidden" name="_method" value="DELETE">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <a href="{{ route('blog-category.edit', ['id' => $item->id]) }}" class="btn btn-warning col-sm-3 col-xs-5 btn-margin">
+                        <a href="{{ route('product-category.edit', ['id' => $item->id]) }}" class="btn btn-warning col-sm-3 col-xs-5 btn-margin">
                         Sửa
                         </a>
 {{--                        @if ($user->username != Auth::user()->username)--}}

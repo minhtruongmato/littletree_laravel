@@ -5,9 +5,9 @@
         <div class="row">
             <div class="col-md-12 col-md-offset-0">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Thêm mới bài viết - <strong>Danh mục: <span style="color:red">{{ ($type == 'advise') ? 'Tư vấn' : 'Tin tức' }}</span></strong></div>
+                    <div class="panel-heading">Thêm mới bài viết</div>
                     <div class="panel-body">
-                        <form class="form-horizontal" role="form" method="POST" action="{{ route('blog.store', ['type' => $type]) }}" enctype="multipart/form-data">
+                        <form class="form-horizontal" role="form" method="POST" action="{{ route('blog.store') }}" enctype="multipart/form-data">
                             {{ csrf_field() }}
                             <div class="form-group{{ $errors->has('title') ? ' has-error' : '' }}">
                                 <label for="title" class="col-md-2 control-label">Tên bài viết</label>
@@ -58,21 +58,8 @@
                                     <input type="file" id="image" name="image" required >
                                 </div>
                             </div>
-                            <div class="form-group{{ $errors->has('description') ? ' has-error' : '' }}">
-                                <label for="description" class="col-md-2 control-label">Giới thiệu ngắn</label>
-
-                                <div class="col-md-8">
-                                    <textarea id="description" rows="10" class="form-control" name="description" value="{{ old('description') }}"></textarea>
-
-                                    @if ($errors->has('description'))
-                                        <span class="help-block">
-                                        <strong>{{ $errors->first('description') }}</strong>
-                                    </span>
-                                    @endif
-                                </div>
-                            </div>
                             <div class="form-group{{ $errors->has('content') ? ' has-error' : '' }}">
-                                <label for="content" class="col-md-2 control-label">Thông tin chi tiết</label>
+                                <label for="content" class="col-md-2 control-label">Nội dung</label>
 
                                 <div class="col-md-8">
                                     <textarea id="content" rows="10" class="form-control tinymce" name="content" value="{{ old('content') }}"></textarea>
