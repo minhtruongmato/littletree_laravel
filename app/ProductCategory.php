@@ -19,4 +19,7 @@ class ProductCategory extends Model
      * @var array
      */
     protected $guarded = [];
+    public function product(){
+        return $this->hasMany('App\Product','category_id','id');
+    }
 }
