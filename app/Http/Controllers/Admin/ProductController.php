@@ -34,14 +34,7 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        $products = DB::table('product')
-            ->select('*')
-            ->where('is_deleted',0)
-            ->paginate(10);
-        foreach ($products as $key => $value) {
-                $sub = ProductCategory::find($value->category_id);
-                $products[$key]->sub = $sub->title;
-        }
+        $products = Product::with('productCategory')->Paginate(10);
         return view('admin/product/index', ['products' => $products]);
     }
 
@@ -140,7 +133,7 @@ class ProductController extends Controller
             rename($path . '/' . $product->slug, $path . '/' . $uniqueSlug);
         }
 
-        $keys = ['title', 'price_min', 'price_mid', 'price_max', 'content', 'description'];
+        $keys = ['title','category_id', 'price_min', 'price_mid', 'price_max', 'content', 'description'];
         $input = $this->createQueryInput($keys, $request);
         $input['slug'] = $uniqueSlug;
 
@@ -159,7 +152,6 @@ class ProductController extends Controller
         return redirect()->intended('admin/product');
         }
         Session::flash('error','Sửa sản phẩm thất bại');
-        return redirect()->intended('admin/product');
         return redirect()->intended('admin/product');
     }
 

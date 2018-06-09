@@ -42,7 +42,7 @@
                 <tr role="row" class="odd">
                   <td class="hidden-xs">{{$item->title}}</td>
                   <td class="hidden-xs">{{$item->slug}}</td>
-                  <td class="hidden-xs">{{$item->sub}}</td>
+                  <td class="hidden-xs">{!! $item->productCategory['title'] !!}</td>
                   <td>
                     <form class="row" method="POST" action="{{ route('product.destroy', ['id' => $item->id]) }}" onsubmit = "return confirm('Chắc chắn xoá?')">
                         <button class="btn btn-primary collapsed col-sm-2 col-xs-5 btn-margin" type="button" data-toggle="collapse" href="#{{ $item->id }}" aria-expanded="true" aria-controls="messageContent">Chi tiết</button>
@@ -74,7 +74,8 @@
                             <br>
                             <strong>Tên sản phẩm: </strong> {!! $item->title !!}
                             <br>
-                            <strong>Danh mục cha: </strong> {{ $item->sub }}
+
+                            <strong>Danh mục cha: </strong> {!! $item->productCategory['title'] !!}
                             <br>
                             <strong>Giá cho sản phẩm nhỏ: </strong> {!! $item->price_min !!}
                             <br>
